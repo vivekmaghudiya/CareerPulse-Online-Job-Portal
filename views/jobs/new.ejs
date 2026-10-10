@@ -1,0 +1,156 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-5">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card-modern shadow-sm">
+          <div class="card-header bg-white border-bottom p-4">
+            <h2 class="h4 fw-bold mb-1">
+              <i class="bi bi-briefcase-fill text-primary me-2"></i> Post a New Job Vacancy
+            </h2>
+            <p class="text-muted small mb-0">Fill in the job details below to publish your opening to job seekers worldwide.</p>
+          </div>
+
+          <div class="p-4 p-md-5">
+            <form action="/jobs/new" method="POST">
+              <div class="row g-3">
+                <!-- Job Title -->
+                <div class="col-md-12">
+                  <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    placeholder="e.g. Senior Backend Node.js Engineer"
+                    value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : '' %>"
+                    required
+                  >
+                </div>
+
+                <!-- Company Name -->
+                <div class="col-md-6">
+                  <label for="company" class="form-label">Company / Organization <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="company"
+                    name="company"
+                    placeholder="e.g. TechCorp Innovations"
+                    value="<%= typeof formData !== 'undefined' && formData.company ? formData.company : '' %>"
+                    required
+                  >
+                </div>
+
+                <!-- Location -->
+                <div class="col-md-6">
+                  <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="location"
+                    name="location"
+                    placeholder="e.g. New York, NY or Remote"
+                    value="<%= typeof formData !== 'undefined' && formData.location ? formData.location : '' %>"
+                    required
+                  >
+                </div>
+
+                <!-- Category -->
+                <div class="col-md-6">
+                  <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                  <select class="form-select" id="category" name="category" required>
+                    <option value="" disabled selected>Select category...</option>
+                    <% categories.forEach(cat => { %>
+                      <option value="<%= cat %>" <%= typeof formData !== 'undefined' && formData.category === cat ? 'selected' : '' %>>
+                        <%= cat %>
+                      </option>
+                    <% }) %>
+                  </select>
+                </div>
+
+                <!-- Employment Type -->
+                <div class="col-md-6">
+                  <label for="jobType" class="form-label">Job Type <span class="text-danger">*</span></label>
+                  <select class="form-select" id="jobType" name="jobType" required>
+                    <option value="" disabled selected>Select type...</option>
+                    <% jobTypes.forEach(jt => { %>
+                      <option value="<%= jt %>" <%= typeof formData !== 'undefined' && formData.jobType === jt ? 'selected' : '' %>>
+                        <%= jt %>
+                      </option>
+                    <% }) %>
+                  </select>
+                </div>
+
+                <!-- Salary / Compensation -->
+                <div class="col-md-12">
+                  <label for="salary" class="form-label">Salary Range / Compensation <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="salary"
+                    name="salary"
+                    placeholder="e.g. $90,000 - $115,000 / year or $45 / hour"
+                    value="<%= typeof formData !== 'undefined' && formData.salary ? formData.salary : '' %>"
+                    required
+                  >
+                </div>
+
+                <!-- Job Description -->
+                <div class="col-md-12">
+                  <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                  <textarea
+                    class="form-control"
+                    id="description"
+                    name="description"
+                    rows="5"
+                    placeholder="Provide an overview of the role, day-to-day responsibilities, and team culture..."
+                    required
+                  ><%= typeof formData !== 'undefined' && formData.description ? formData.description : '' %></textarea>
+                </div>
+
+                <!-- Requirements -->
+                <div class="col-md-12">
+                  <label for="requirements" class="form-label">Candidate Requirements & Qualifications <span class="text-danger">*</span></label>
+                  <textarea
+                    class="form-control"
+                    id="requirements"
+                    name="requirements"
+                    rows="4"
+                    placeholder="List required skills, experience level, tools, certifications..."
+                    required
+                  ><%= typeof formData !== 'undefined' && formData.requirements ? formData.requirements : '' %></textarea>
+                </div>
+
+                <!-- Featured Toggle -->
+                <div class="col-md-12">
+                  <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="isFeatured" name="isFeatured" <%= typeof formData !== 'undefined' && formData.isFeatured ? 'checked' : '' %>>
+                    <label class="form-check-label fw-semibold" for="isFeatured">
+                      Highlight as Featured Listing (Displayed prominently on home page)
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12 mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                  <a href="/dashboard/employer" class="btn btn-outline-secondary">
+                    Cancel
+                  </a>
+                  <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <i class="bi bi-cloud-arrow-up me-1"></i> Publish Job Listing
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

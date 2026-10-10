@@ -1,0 +1,163 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-4">
+  <div class="container">
+    <!-- Breadcrumb & Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a href="/dashboard/employer" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/jobs/<%= job._id %>" class="text-decoration-none"><%= job.title %></a></li>
+            <li class="breadcrumb-item active" aria-current="page">Applicants</li>
+          </ol>
+        </nav>
+        <h1 class="h3 fw-bold mb-0">Candidate Applications</h1>
+        <p class="text-muted small mb-0">
+          For position: <strong><%= job.title %></strong> at <%= job.company %>
+        </p>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/jobs/<%= job._id %>" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-eye me-1"></i> View Job
+        </a>
+        <a href="/dashboard/employer" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Employer Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Applicants List Card -->
+    <div class="card-modern shadow-sm">
+      <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">
+          <i class="bi bi-people-fill text-primary me-2"></i> Received Applications (<%= applications.length %>)
+        </h5>
+      </div>
+
+      <div class="p-0">
+        <% if (applications && applications.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th scope="col" class="ps-4">Candidate</th>
+                  <th scope="col">Contact Info</th>
+                  <th scope="col">Applied Date</th>
+                  <th scope="col">Resume / CV</th>
+                  <th scope="col">Cover Letter</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="text-end pe-4">Update Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% applications.forEach(app => { %>
+                  <tr>
+                    <!-- Candidate Name -->
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                          <%= app.applicantId ? app.applicantId.name.charAt(0).toUpperCase() : 'U' %>
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark"><%= app.applicantId ? app.applicantId.name : 'Unknown User' %></div>
+                          <% if (app.applicantId && app.applicantId.bio) { %>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 180px;"><%= app.applicantId.bio %></small>
+                          <% } %>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Contact -->
+                    <td>
+                      <div class="small">
+                        <div><i class="bi bi-envelope text-muted me-1"></i> <%= app.applicantId ? app.applicantId.email : 'N/A' %></div>
+                        <% if (app.applicantId && app.applicantId.phone) { %>
+                          <div><i class="bi bi-telephone text-muted me-1"></i> <%= app.applicantId.phone %></div>
+                        <% } %>
+                      </div>
+                    </td>
+
+                    <!-- Date -->
+                    <td>
+                      <small class="text-muted"><%= formatDate(app.appliedAt) %></small>
+                      <small class="text-muted d-block" style="font-size: 0.75rem;"><%= timeAgo(app.appliedAt) %></small>
+                    </td>
+
+                    <!-- Resume -->
+                    <td>
+                      <a href="<%= app.resumePath %>" target="_blank" download class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        <span class="text-truncate" style="max-width: 120px;"><%= app.resumeOriginalName || 'Resume' %></span>
+                      </a>
+                    </td>
+
+                    <!-- Cover Letter -->
+                    <td>
+                      <% if (app.coverLetter) { %>
+                        <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#clModal<%= app._id %>">
+                          <i class="bi bi-chat-text text-primary"></i> Read
+                        </button>
+
+                        <!-- Cover Letter Modal -->
+                        <div class="modal fade" id="clModal<%= app._id %>" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4">
+                              <div class="modal-header border-bottom">
+                                <h5 class="modal-title fw-bold">Cover Letter from <%= app.applicantId ? app.applicantId.name : 'Applicant' %></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body p-4 text-secondary lh-lg" style="white-space: pre-line;">
+                                <%= app.coverLetter %>
+                              </div>
+                              <div class="modal-footer border-top">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      <% } else { %>
+                        <span class="text-muted small">None provided</span>
+                      <% } %>
+                    </td>
+
+                    <!-- Status Badge -->
+                    <td>
+                      <span class="badge badge-status-<%= app.status.toLowerCase() %>">
+                        <%= app.status %>
+                      </span>
+                    </td>
+
+                    <!-- Status Change Form -->
+                    <td class="text-end pe-4">
+                      <form action="/dashboard/applications/<%= app._id %>/status" method="POST" class="d-inline-flex align-items-center gap-1">
+                        <select name="status" class="form-select form-select-sm py-1" style="min-width: 120px;" onchange="this.form.submit()">
+                          <option value="Pending" <%= app.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                          <option value="Reviewed" <%= app.status === 'Reviewed' ? 'selected' : '' %>>Reviewed</option>
+                          <option value="Shortlisted" <%= app.status === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+                          <option value="Accepted" <%= app.status === 'Accepted' ? 'selected' : '' %>>Accepted</option>
+                          <option value="Rejected" <%= app.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+                        </select>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted display-4"></i>
+            <h5 class="fw-bold mt-3">No applications received yet</h5>
+            <p class="text-muted small">Candidates will appear here as soon as they submit their resumes for this job.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,609 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-4">
+  <div class="container">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-danger text-uppercase px-2 py-1 fw-bold">Admin Authority</span>
+          <h1 class="h3 fw-bold mb-0">Platform Control & Management</h1>
+        </div>
+        <p class="text-muted small mb-0">Comprehensive control over users, job listings, candidate applications, and platform security.</p>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/jobs/new" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-plus-lg me-1"></i> Post Job As Admin
+        </a>
+        <a href="/dashboard/employer" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-briefcase me-1"></i> Employer View
+        </a>
+      </div>
+    </div>
+
+    <!-- Platform Metrics Counters -->
+    <div class="row g-3 mb-4">
+      <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0"><%= stats.totalUsers %></h4>
+            <span class="text-muted small">Total Users</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-person-badge"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0"><%= stats.totalSeekers %></h4>
+            <span class="text-muted small">Job Seekers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-building"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0"><%= stats.totalEmployers %></h4>
+            <span class="text-muted small">Employers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 col-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0"><%= stats.totalJobs %></h4>
+            <span class="text-muted small">Job Listings</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 col-12">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-purple bg-opacity-10 text-indigo" style="width: 44px; height: 44px; font-size: 1.25rem; background-color: #ede9fe; color: #6366f1;">
+            <i class="bi bi-send-check-fill"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0"><%= stats.totalApplications %></h4>
+            <span class="text-muted small">Applications Tracked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Tabs: Users, Jobs, Applications -->
+    <ul class="nav nav-pills mb-3 gap-2" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link <%= filters.activeTab === 'users' ? 'active' : '' %> fw-bold px-3 py-2"
+          id="users-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#users-panel"
+          type="button"
+          role="tab"
+          aria-controls="users-panel"
+          aria-selected="<%= filters.activeTab === 'users' %>"
+        >
+          <i class="bi bi-people-fill me-1"></i> User Management (<%= users.length %>)
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link <%= filters.activeTab === 'jobs' ? 'active' : '' %> fw-bold px-3 py-2"
+          id="jobs-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#jobs-panel"
+          type="button"
+          role="tab"
+          aria-controls="jobs-panel"
+          aria-selected="<%= filters.activeTab === 'jobs' %>"
+        >
+          <i class="bi bi-briefcase-fill me-1"></i> Job Postings (<%= jobs.length %>)
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link <%= filters.activeTab === 'applications' ? 'active' : '' %> fw-bold px-3 py-2"
+          id="apps-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#apps-panel"
+          type="button"
+          role="tab"
+          aria-controls="apps-panel"
+          aria-selected="<%= filters.activeTab === 'applications' %>"
+        >
+          <i class="bi bi-journal-check me-1"></i> Applications Hub (<%= applications.length %>)
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+
+      <!-- ========================================== -->
+      <!-- 1. USERS MANAGEMENT TAB                    -->
+      <!-- ========================================== -->
+      <div class="tab-pane fade <%= filters.activeTab === 'users' ? 'show active' : '' %>" id="users-panel" role="tabpanel" aria-labelledby="users-tab">
+        <div class="card-modern shadow-sm mb-4">
+          <!-- User Search & Filter Header -->
+          <div class="card-header bg-white border-bottom p-3">
+            <form action="/dashboard/admin" method="GET" class="row g-2 align-items-center">
+              <input type="hidden" name="tab" value="users">
+              <div class="col-md-5">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" name="userSearch" class="form-control border-start-0" placeholder="Search users by name, email, or company..." value="<%= filters.userSearch %>">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select name="userRole" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="all" <%= filters.userRole === 'all' ? 'selected' : '' %>>All Roles</option>
+                  <option value="job_seeker" <%= (filters.userRole === 'job_seeker' || filters.userRole === 'jobseeker') ? 'selected' : '' %>>Job Seekers</option>
+                  <option value="employer" <%= filters.userRole === 'employer' ? 'selected' : '' %>>Employers</option>
+                  <option value="admin" <%= filters.userRole === 'admin' ? 'selected' : '' %>>Administrators</option>
+                </select>
+              </div>
+              <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+                <a href="/dashboard/admin?tab=users" class="btn btn-sm btn-outline-secondary">Reset</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Users Table -->
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th scope="col" class="ps-4">User</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Account Status</th>
+                  <th scope="col">Activity</th>
+                  <th scope="col" class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (users && users.length > 0) { %>
+                  <% users.forEach(u => { %>
+                    <tr>
+                      <!-- User Info -->
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center gap-2">
+                          <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <%= u.name.charAt(0).toUpperCase() %>
+                          </div>
+                          <div>
+                            <div class="fw-bold text-dark"><%= u.name %></div>
+                            <% if (u.companyName) { %>
+                              <small class="text-muted"><i class="bi bi-building"></i> <%= u.companyName %></small>
+                            <% } else { %>
+                              <small class="text-muted">Registered <%= formatDate(u.createdAt) %></small>
+                            <% } %>
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Email / Phone -->
+                      <td>
+                        <div class="small">
+                          <div><i class="bi bi-envelope text-muted me-1"></i> <%= u.email %></div>
+                          <% if (u.phone) { %>
+                            <div><i class="bi bi-telephone text-muted me-1"></i> <%= u.phone %></div>
+                          <% } %>
+                        </div>
+                      </td>
+
+                      <!-- Role Form -->
+                      <td>
+                        <form action="/dashboard/admin/users/<%= u._id %>/role" method="POST" class="d-inline-block">
+                          <select
+                            name="role"
+                            class="form-select form-select-sm"
+                            style="min-width: 125px;"
+                            onchange="this.form.submit()"
+                            <%= u._id.toString() === currentUser._id.toString() ? 'disabled' : '' %>
+                          >
+                            <option value="job_seeker" <%= (u.role === 'job_seeker' || u.role === 'jobseeker') ? 'selected' : '' %>>Job Seeker</option>
+                            <option value="employer" <%= u.role === 'employer' ? 'selected' : '' %>>Employer</option>
+                            <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                          </select>
+                        </form>
+                      </td>
+
+                      <!-- Status Badge & Toggle -->
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <% if (u.isActive !== false) { %>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                              <i class="bi bi-check-circle me-1"></i> Active
+                            </span>
+                          <% } else { %>
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
+                              <i class="bi bi-slash-circle me-1"></i> Deactivated
+                            </span>
+                          <% } %>
+
+                          <% if (u._id.toString() !== currentUser._id.toString()) { %>
+                            <form action="/dashboard/admin/users/<%= u._id %>/status" method="POST" class="d-inline">
+                              <input type="hidden" name="isActive" value="<%= u.isActive === false ? 'true' : 'false' %>">
+                              <button type="submit" class="btn btn-sm btn-link p-0 text-decoration-none small text-muted" title="<%= u.isActive === false ? 'Activate User' : 'Deactivate User' %>">
+                                <i class="bi <%= u.isActive === false ? 'bi-toggle-off fs-5 text-secondary' : 'bi-toggle-on fs-5 text-success' %>"></i>
+                              </button>
+                            </form>
+                          <% } %>
+                        </div>
+                      </td>
+
+                      <!-- Activity Metrics -->
+                      <td>
+                        <span class="small text-muted">
+                          <% if (u.role === 'employer') { %>
+                            <i class="bi bi-briefcase text-primary me-1"></i> <%= u.jobsCount %> jobs
+                          <% } else { %>
+                            <i class="bi bi-send text-primary me-1"></i> <%= u.appsCount %> apps
+                          <% } %>
+                        </span>
+                      </td>
+
+                      <!-- Actions -->
+                      <td class="text-end pe-4">
+                        <div class="btn-group">
+                          <!-- User Details Modal Button -->
+                          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#userModal<%= u._id %>" title="View User Details">
+                            <i class="bi bi-info-circle"></i>
+                          </button>
+
+                          <!-- Delete User -->
+                          <% if (u._id.toString() !== currentUser._id.toString()) { %>
+                            <form action="/dashboard/admin/users/<%= u._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.name %>? This will remove all associated jobs and applications.');" class="d-inline">
+                              <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete User">
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </form>
+                          <% } else { %>
+                            <span class="badge bg-secondary ms-1">Self</span>
+                          <% } %>
+                        </div>
+
+                        <!-- User Details Modal -->
+                        <div class="modal fade text-start" id="userModal<%= u._id %>" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4">
+                              <div class="modal-header border-bottom">
+                                <h5 class="modal-title fw-bold">User Information</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body p-4">
+                                <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                                  <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 50px; height: 50px;">
+                                    <%= u.name.charAt(0).toUpperCase() %>
+                                  </div>
+                                  <div>
+                                    <h5 class="fw-bold mb-0"><%= u.name %></h5>
+                                    <span class="badge bg-light text-dark border text-uppercase"><%= u.role %></span>
+                                    <span class="badge <%= u.isActive !== false ? 'bg-success' : 'bg-danger' %>"><%= u.isActive !== false ? 'Active' : 'Deactivated' %></span>
+                                  </div>
+                                </div>
+
+                                <div class="small">
+                                  <div class="mb-2"><strong>User ID:</strong> <span class="font-monospace text-muted"><%= u._id %></span></div>
+                                  <div class="mb-2"><strong>Email:</strong> <%= u.email %></div>
+                                  <div class="mb-2"><strong>Phone:</strong> <%= u.phone || 'Not provided' %></div>
+                                  <% if (u.companyName) { %>
+                                    <div class="mb-2"><strong>Company:</strong> <%= u.companyName %></div>
+                                  <% } %>
+                                  <div class="mb-2"><strong>Registered On:</strong> <%= formatDate(u.createdAt) %></div>
+                                  <div class="mb-2"><strong>Bio / Summary:</strong> <%= u.bio || 'None' %></div>
+                                </div>
+                              </div>
+                              <div class="modal-footer border-top bg-light">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                      No users match the search and filter criteria.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 2. JOBS MANAGEMENT TAB                     -->
+      <!-- ========================================== -->
+      <div class="tab-pane fade <%= filters.activeTab === 'jobs' ? 'show active' : '' %>" id="jobs-panel" role="tabpanel" aria-labelledby="jobs-tab">
+        <div class="card-modern shadow-sm mb-4">
+          <!-- Job Search & Filter Header -->
+          <div class="card-header bg-white border-bottom p-3">
+            <form action="/dashboard/admin" method="GET" class="row g-2 align-items-center">
+              <input type="hidden" name="tab" value="jobs">
+              <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" name="jobSearch" class="form-control border-start-0" placeholder="Search title, company, location..." value="<%= filters.jobSearch %>">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select name="jobStatus" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="all" <%= filters.jobStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+                  <option value="active" <%= filters.jobStatus === 'active' ? 'selected' : '' %>>Active</option>
+                  <option value="closed" <%= filters.jobStatus === 'closed' ? 'selected' : '' %>>Closed</option>
+                </select>
+              </div>
+              <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+                <a href="/dashboard/admin?tab=jobs" class="btn btn-sm btn-outline-secondary">Reset</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Jobs Table -->
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th scope="col" class="ps-4">Job Title</th>
+                  <th scope="col">Company / Recruiter</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Applicants</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (jobs && jobs.length > 0) { %>
+                  <% jobs.forEach(j => { %>
+                    <tr>
+                      <!-- Job Title & Location -->
+                      <td class="ps-4">
+                        <a href="/jobs/<%= j._id %>" class="fw-bold text-dark text-decoration-none hover-primary">
+                          <%= j.title %>
+                        </a>
+                        <div class="small text-muted d-flex align-items-center gap-1">
+                          <i class="bi bi-geo-alt"></i> <%= j.location %> &bull; <span class="badge-job-type py-0 px-1"><%= j.jobType %></span>
+                        </div>
+                      </td>
+
+                      <!-- Company & Employer -->
+                      <td>
+                        <div class="fw-semibold text-dark"><%= j.company %></div>
+                        <% if (j.employerId) { %>
+                          <small class="text-muted">By <%= j.employerId.name %> (<%= j.employerId.email %>)</small>
+                        <% } else { %>
+                          <small class="text-muted fst-italic">Unknown employer</small>
+                        <% } %>
+                      </td>
+
+                      <!-- Category & Salary -->
+                      <td>
+                        <span class="badge bg-light text-dark border"><%= j.category %></span>
+                        <small class="text-primary d-block fw-semibold mt-1"><%= j.salary %></small>
+                      </td>
+
+                      <!-- Applications -->
+                      <td>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                          <i class="bi bi-people-fill me-1"></i> <%= j.applicationCount %> applicants
+                        </span>
+                      </td>
+
+                      <!-- Status & Toggle -->
+                      <td>
+                        <form action="/dashboard/admin/jobs/<%= j._id %>/status" method="POST" class="d-inline-flex align-items-center gap-1">
+                          <select name="status" class="form-select form-select-sm py-1" style="min-width: 100px;" onchange="this.form.submit()">
+                            <option value="active" <%= j.status === 'active' ? 'selected' : '' %>>Active</option>
+                            <option value="closed" <%= j.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                          </select>
+                        </form>
+                      </td>
+
+                      <!-- Actions -->
+                      <td class="text-end pe-4">
+                        <div class="btn-group">
+                          <a href="/jobs/<%= j._id %>" class="btn btn-sm btn-outline-primary" title="View Job Details">
+                            <i class="bi bi-eye"></i>
+                          </a>
+                          <a href="/jobs/<%= j._id %>/edit" class="btn btn-sm btn-outline-secondary" title="Edit Job Details">
+                            <i class="bi bi-pencil"></i>
+                          </a>
+                          <form action="/dashboard/admin/jobs/<%= j._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to remove job listing <%= j.title %>? All received applications will be deleted.');" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Listing">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                      No job listings match the search criteria.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 3. APPLICATIONS MANAGEMENT TAB             -->
+      <!-- ========================================== -->
+      <div class="tab-pane fade <%= filters.activeTab === 'applications' ? 'show active' : '' %>" id="apps-panel" role="tabpanel" aria-labelledby="apps-tab">
+        <div class="card-modern shadow-sm mb-4">
+          <!-- Application Filter Header -->
+          <div class="card-header bg-white border-bottom p-3">
+            <form action="/dashboard/admin" method="GET" class="row g-2 align-items-center">
+              <input type="hidden" name="tab" value="applications">
+              <div class="col-md-5">
+                <select name="appStatus" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="all" <%= filters.appStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+                  <option value="Pending" <%= filters.appStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="Reviewed" <%= filters.appStatus === 'Reviewed' ? 'selected' : '' %>>Reviewed</option>
+                  <option value="Shortlisted" <%= filters.appStatus === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+                  <option value="Accepted" <%= filters.appStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
+                  <option value="Rejected" <%= filters.appStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <a href="/dashboard/admin?tab=applications" class="btn btn-sm btn-outline-secondary">Reset Filter</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Applications Table -->
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                  <th scope="col" class="ps-4">Applicant</th>
+                  <th scope="col">Target Position</th>
+                  <th scope="col">Applied On</th>
+                  <th scope="col">Resume</th>
+                  <th scope="col">Cover Letter</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (applications && applications.length > 0) { %>
+                  <% applications.forEach(app => { %>
+                    <tr>
+                      <!-- Applicant Info -->
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center gap-2">
+                          <div class="rounded-circle bg-secondary bg-opacity-10 text-dark fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <%= app.applicantId ? app.applicantId.name.charAt(0).toUpperCase() : 'U' %>
+                          </div>
+                          <div>
+                            <div class="fw-bold text-dark"><%= app.applicantId ? app.applicantId.name : 'Unknown User' %></div>
+                            <small class="text-muted"><%= app.applicantId ? app.applicantId.email : 'N/A' %></small>
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Job Info -->
+                      <td>
+                        <% if (app.jobId) { %>
+                          <a href="/jobs/<%= app.jobId._id %>" class="fw-bold text-dark text-decoration-none hover-primary">
+                            <%= app.jobId.title %>
+                          </a>
+                          <small class="text-muted d-block"><%= app.jobId.company %> &bull; <%= app.jobId.location %></small>
+                        <% } else { %>
+                          <span class="text-muted fst-italic">Job listing removed</span>
+                        <% } %>
+                      </td>
+
+                      <!-- Applied Date -->
+                      <td>
+                        <small class="text-dark"><%= formatDate(app.appliedAt) %></small>
+                        <small class="text-muted d-block" style="font-size: 0.75rem;"><%= timeAgo(app.appliedAt) %></small>
+                      </td>
+
+                      <!-- Resume Download -->
+                      <td>
+                        <a href="<%= app.resumePath %>" target="_blank" download class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                          <i class="bi bi-file-earmark-pdf"></i>
+                          <span class="text-truncate" style="max-width: 100px;"><%= app.resumeOriginalName || 'Resume' %></span>
+                        </a>
+                      </td>
+
+                      <!-- Cover Letter -->
+                      <td>
+                        <% if (app.coverLetter) { %>
+                          <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#adminCLModal<%= app._id %>">
+                            <i class="bi bi-chat-text text-primary"></i> View
+                          </button>
+
+                          <!-- Cover Letter Modal -->
+                          <div class="modal fade" id="adminCLModal<%= app._id %>" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content border-0 shadow-lg rounded-4">
+                                <div class="modal-header border-bottom">
+                                  <h5 class="modal-title fw-bold">Cover Letter: <%= app.applicantId ? app.applicantId.name : 'Applicant' %></h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-4 text-secondary lh-lg" style="white-space: pre-line;">
+                                  <%= app.coverLetter %>
+                                </div>
+                                <div class="modal-footer border-top">
+                                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        <% } else { %>
+                          <span class="text-muted small">None</span>
+                        <% } %>
+                      </td>
+
+                      <!-- Status Dropdown Form -->
+                      <td>
+                        <form action="/dashboard/admin/applications/<%= app._id %>/status" method="POST" class="d-inline-flex align-items-center gap-1">
+                          <select name="status" class="form-select form-select-sm py-1" style="min-width: 120px;" onchange="this.form.submit()">
+                            <option value="Pending" <%= app.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="Reviewed" <%= app.status === 'Reviewed' ? 'selected' : '' %>>Reviewed</option>
+                            <option value="Shortlisted" <%= app.status === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+                            <option value="Accepted" <%= app.status === 'Accepted' ? 'selected' : '' %>>Accepted</option>
+                            <option value="Rejected" <%= app.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+                          </select>
+                        </form>
+                      </td>
+
+                      <!-- Delete Action -->
+                      <td class="text-end pe-4">
+                        <form action="/dashboard/admin/applications/<%= app._id %>/delete" method="POST" onsubmit="return confirm('Delete this application record?');" class="d-inline">
+                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Application">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                      No applications recorded yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

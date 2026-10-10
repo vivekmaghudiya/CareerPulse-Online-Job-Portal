@@ -1,0 +1,237 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-5">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card-modern shadow-lg">
+          <div class="p-4 p-md-5">
+            <div class="text-center mb-4">
+              <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class="bi bi-person-plus-fill"></i>
+              </div>
+              <h1 class="h3 fw-bold mb-1">Create an Account</h1>
+              <p class="text-muted small">Choose your path and connect with opportunities worldwide</p>
+            </div>
+
+            <form action="/auth/register" method="POST" id="registerForm" novalidate>
+              <!-- Account Type Selection -->
+              <div class="mb-4">
+                <label for="role" class="form-label fw-semibold">I want to register as: <span class="text-danger">*</span></label>
+                <select class="form-select" id="role" name="role" required>
+                  <option value="" disabled selected>Select Account Type...</option>
+                  <option value="job_seeker">👤 Job Seeker (I am looking for employment)</option>
+                  <option value="employer">🏢 Employer / Recruiter (I want to post jobs & hire)</option>
+                </select>
+                <div class="invalid-feedback" id="roleFeedback">
+                  Please select a valid account type (Job Seeker or Employer).
+                </div>
+              </div>
+
+              <!-- Full Name -->
+              <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-person"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-start-0 ps-0"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. John Doe"
+                    autocomplete="name"
+                    value=""
+                    required
+                  >
+                  <div class="invalid-feedback" id="nameFeedback">
+                    Full name is required.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Company Name (Dynamic for Employer) -->
+              <div class="mb-3" id="companyNameWrapper" style="display: none;">
+                <label for="companyName" class="form-label fw-semibold">Company / Organization Name <span class="text-danger">*</span></label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-building"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-start-0 ps-0"
+                    id="companyName"
+                    name="companyName"
+                    placeholder="e.g. Acme Innovations Corp."
+                    autocomplete="organization"
+                    value=""
+                  >
+                  <div class="invalid-feedback" id="companyFeedback">
+                    Company name is required for Employer accounts.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Work or Personal Email <span class="text-danger">*</span></label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    class="form-control border-start-0 ps-0"
+                    id="email"
+                    name="email"
+                    placeholder="name@example.com"
+                    autocomplete="email"
+                    value=""
+                    required
+                  >
+                  <div class="invalid-feedback" id="emailFeedback">
+                    Email address is required.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Phone (Optional) -->
+              <div class="mb-3">
+                <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-muted fw-normal">(Optional)</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-telephone"></i>
+                  </span>
+                  <input
+                    type="tel"
+                    class="form-control border-start-0 ps-0"
+                    id="phone"
+                    name="phone"
+                    placeholder="+1 (555) 000-0000"
+                    autocomplete="tel"
+                    value=""
+                  >
+                </div>
+              </div>
+
+              <!-- Password Fields -->
+              <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                  <label for="password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                  <div class="input-group has-validation">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control border-start-0 border-end-0 ps-0"
+                      id="password"
+                      name="password"
+                      placeholder="Min 6 characters"
+                      minlength="6"
+                      autocomplete="new-password"
+                      value=""
+                      required
+                    >
+                    <button class="btn btn-outline-secondary border-start-0 text-muted" type="button" id="toggleRegPassword" aria-label="Toggle password visibility">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <div class="invalid-feedback" id="passwordFeedback">
+                      Password is required.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="confirmPassword" class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                  <div class="input-group has-validation">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                      <i class="bi bi-shield-check"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control border-start-0 border-end-0 ps-0"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Repeat password"
+                      minlength="6"
+                      autocomplete="new-password"
+                      value=""
+                      required
+                    >
+                    <button class="btn btn-outline-secondary border-start-0 text-muted" type="button" id="toggleRegConfirmPassword" aria-label="Toggle confirm password visibility">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <div class="invalid-feedback" id="confirmPasswordFeedback">
+                      Please confirm your password.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Real-time Password Strength Meter -->
+              <div class="mb-4" id="passwordStrengthSection">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small fw-semibold text-muted">Password Strength:</span>
+                  <span class="small fw-bold text-muted" id="passwordStrengthLabel">Enter password</span>
+                </div>
+                <div class="progress mb-2" style="height: 6px; background-color: #e9ecef;">
+                  <div class="progress-bar transition-all" id="passwordStrengthBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="card bg-light border-0 p-2 rounded-3 small text-muted">
+                  <div class="row g-1" id="strengthCriteria">
+                    <div class="col-sm-6 d-flex align-items-center gap-1" id="critLength">
+                      <i class="bi bi-dash-circle text-muted"></i> <span>At least 6 characters</span>
+                    </div>
+                    <div class="col-sm-6 d-flex align-items-center gap-1" id="critUpper">
+                      <i class="bi bi-dash-circle text-muted"></i> <span>Uppercase letter (A-Z)</span>
+                    </div>
+                    <div class="col-sm-6 d-flex align-items-center gap-1" id="critLower">
+                      <i class="bi bi-dash-circle text-muted"></i> <span>Lowercase letter (a-z)</span>
+                    </div>
+                    <div class="col-sm-6 d-flex align-items-center gap-1" id="critNumber">
+                      <i class="bi bi-dash-circle text-muted"></i> <span>At least 1 number (0-9)</span>
+                    </div>
+                    <div class="col-12 d-flex align-items-center gap-1" id="critSpecial">
+                      <i class="bi bi-dash-circle text-muted"></i> <span>Special character (!@#$%^&*)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terms Agreement -->
+              <div class="mb-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                  <label class="form-check-label small text-muted" for="agreeTerms">
+                    I agree to the <a href="#" class="text-primary text-decoration-none">Terms of Service</a> and <a href="#" class="text-primary text-decoration-none">Privacy Policy</a>.
+                  </label>
+                  <div class="invalid-feedback" id="termsFeedback">
+                    You must agree to the Terms of Service to continue.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button with Loading State -->
+              <button type="submit" id="registerSubmitBtn" class="btn btn-primary w-100 py-2 mb-3 fw-bold">
+                <span id="registerBtnText">Create Account <i class="bi bi-arrow-right ms-1"></i></span>
+                <span id="registerBtnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating Account...
+                </span>
+              </button>
+
+              <div class="text-center text-muted small">
+                Already have an account?
+                <a href="/auth/login" class="text-primary fw-semibold text-decoration-none">Sign in here</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

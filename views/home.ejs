@@ -1,0 +1,285 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/alerts') %>
+
+<main>
+  <!-- Hero Section -->
+  <section class="hero-section text-center text-lg-start">
+    <div class="container position-relative">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <span class="badge bg-primary bg-opacity-25 text-white border border-primary border-opacity-50 px-3 py-2 rounded-pill mb-3 fw-semibold">
+            <i class="bi bi-stars me-1 text-warning"></i> #1 Premier Employment Network
+          </span>
+          <h1 class="display-4 fw-extrabold text-white mb-3 lh-sm">
+            Find Your Dream Job <span class="text-primary text-gradient">Today</span>
+          </h1>
+          <p class="lead text-light mb-4 opacity-90">
+            Discover thousands of handpicked career opportunities from leading tech innovators, Fortune 500 companies, and hyper-growth startups.
+          </p>
+
+          <!-- Search Form -->
+          <div class="hero-search-box">
+            <form action="/jobs" method="GET" class="row g-2 align-items-center m-0">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0 text-muted ps-2">
+                    <i class="bi bi-search fs-5 text-primary"></i>
+                  </span>
+                  <input type="text" name="q" class="form-control border-0 shadow-none ps-1" placeholder="Job title, keywords, or company...">
+                </div>
+              </div>
+              <div class="col-md-4 border-start border-md-1">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0 text-muted ps-2">
+                    <i class="bi bi-geo-alt fs-5 text-primary"></i>
+                  </span>
+                  <input type="text" name="location" class="form-control border-0 shadow-none ps-1" placeholder="City, state, or Remote...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                  Find Jobs <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Popular Search Tags -->
+          <div class="d-flex flex-wrap align-items-center gap-2 mt-4 text-light small">
+            <span class="opacity-75">Popular searches:</span>
+            <a href="/jobs?q=Remote" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill border border-white border-opacity-25 hover-light">Remote</a>
+            <a href="/jobs?category=Technology+%26+IT" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill border border-white border-opacity-25 hover-light">Node.js</a>
+            <a href="/jobs?category=Design+%26+Creative" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill border border-white border-opacity-25 hover-light">UI/UX Design</a>
+            <a href="/jobs?category=Finance+%26+Accounting" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill border border-white border-opacity-25 hover-light">Finance</a>
+          </div>
+        </div>
+
+        <!-- Quick Stats Cards on Hero right side -->
+        <div class="col-lg-5">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur text-white text-center">
+                <div class="display-6 fw-bold text-white mb-1"><%= stats.totalJobs %>+</div>
+                <div class="small opacity-75">Live Job Vacancies</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur text-white text-center">
+                <div class="display-6 fw-bold text-white mb-1"><%= stats.totalCompanies %>+</div>
+                <div class="small opacity-75">Hiring Companies</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur text-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle bg-primary bg-opacity-25 p-3 text-white border border-primary border-opacity-50">
+                    <i class="bi bi-shield-check fs-2"></i>
+                  </div>
+                  <div>
+                    <h5 class="text-white mb-1">100% Verified Employers</h5>
+                    <p class="small opacity-75 mb-0">Every job vacancy is actively vetted to ensure legitimate opportunities and competitive compensation.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Job Categories -->
+  <section class="py-5 bg-white border-bottom">
+    <div class="container py-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+        <div>
+          <span class="text-primary fw-semibold small text-uppercase letter-spacing-1">Browse By Sector</span>
+          <h2 class="h3 fw-bold mt-1 mb-0">Popular Job Categories</h2>
+        </div>
+        <a href="/jobs" class="btn btn-link text-primary fw-semibold text-decoration-none p-0 mt-2 mt-md-0">
+          Explore All Categories <i class="bi bi-chevron-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="row g-3">
+        <% 
+        const categoryIcons = {
+          'Technology & IT': 'bi-laptop',
+          'Design & Creative': 'bi-palette',
+          'Sales & Marketing': 'bi-graph-up-arrow',
+          'Finance & Accounting': 'bi-cash-coin',
+          'Healthcare & Medical': 'bi-heart-pulse',
+          'Customer Support': 'bi-headset',
+          'Human Resources': 'bi-people',
+          'Education & Training': 'bi-mortarboard',
+          'Engineering': 'bi-gear-wide-connected',
+          'Other': 'bi-grid'
+        };
+        %>
+        <% categories.slice(0, 8).forEach(cat => { %>
+          <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="/jobs?category=<%= encodeURIComponent(cat.name) %>" class="category-card">
+              <div class="category-icon">
+                <i class="bi <%= categoryIcons[cat.name] || 'bi-briefcase' %>"></i>
+              </div>
+              <div class="overflow-hidden">
+                <h6 class="mb-1 text-truncate fw-bold"><%= cat.name %></h6>
+                <small class="text-muted"><%= cat.count %> open positions</small>
+              </div>
+            </a>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Jobs Section -->
+  <section class="py-5 bg-light">
+    <div class="container py-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+        <div>
+          <span class="text-primary fw-semibold small text-uppercase letter-spacing-1">Handpicked Roles</span>
+          <h2 class="h3 fw-bold mt-1 mb-0">Featured Job Openings</h2>
+        </div>
+        <a href="/jobs" class="btn btn-outline-primary mt-3 mt-md-0">
+          View All <%= stats.totalJobs %> Jobs <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        <% if (featuredJobs && featuredJobs.length > 0) { %>
+          <% featuredJobs.forEach(job => { %>
+            <div class="col-lg-4 col-md-6">
+              <div class="job-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="company-avatar">
+                      <%= job.company.charAt(0).toUpperCase() %>
+                    </div>
+                    <div>
+                      <h6 class="mb-0 fw-bold"><%= job.company %></h6>
+                      <small class="text-muted d-flex align-items-center gap-1">
+                        <i class="bi bi-geo-alt"></i> <%= job.location %>
+                      </small>
+                    </div>
+                  </div>
+                  <% if (job.isFeatured) { %>
+                    <span class="badge-featured">
+                      <i class="bi bi-star-fill text-warning me-1"></i> Featured
+                    </span>
+                  <% } %>
+                </div>
+
+                <h5 class="card-title fw-bold mb-2">
+                  <a href="/jobs/<%= job._id %>" class="text-decoration-none text-dark hover-primary">
+                    <%= job.title %>
+                  </a>
+                </h5>
+
+                <p class="text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  <%= job.description %>
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <span class="badge-job-type"><%= job.jobType %></span>
+                  <span class="badge-job-type"><%= job.category %></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                  <div>
+                    <span class="fw-bold text-primary"><%= job.salary %></span>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;"><%= timeAgo(job.createdAt) %></small>
+                  </div>
+                  <a href="/jobs/<%= job._id %>" class="btn btn-sm btn-outline-primary px-3">
+                    View Details
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="col-12 text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted"></i>
+            <h5 class="text-muted mt-2">No jobs available at this moment.</h5>
+            <p class="text-muted">Check back soon or run the seeder script to populate jobs.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+      <div class="text-center max-w-xl mx-auto mb-5" style="max-width: 650px;">
+        <span class="text-primary fw-semibold small text-uppercase">Streamlined Process</span>
+        <h2 class="h2 fw-bold mt-1">How CareerPulse Works</h2>
+        <p class="text-muted">
+          Whether you are taking the next leap in your professional journey or recruiting elite talent, our platform makes it fast, seamless, and transparent.
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <div class="step-icon">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Create Your Profile</h5>
+            <p class="text-muted small mb-0">
+              Sign up as a Job Seeker or Employer in under a minute. Highlight your core skills or company mission.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <div class="step-icon">
+              <i class="bi bi-search"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Discover or Post Vacancies</h5>
+            <p class="text-muted small mb-0">
+              Filter positions by salary, category, and remote status, or publish job openings with clear requirements.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="step-card">
+            <span class="step-number">3</span>
+            <div class="step-icon">
+              <i class="bi bi-send-check"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Apply & Track Progress</h5>
+            <p class="text-muted small mb-0">
+              Submit your resume and cover letter with one click. Monitor real-time status updates directly from employers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call To Action Section -->
+  <section class="py-5 text-white" style="background: var(--hero-gradient);">
+    <div class="container py-4 text-center">
+      <h2 class="display-6 fw-bold mb-3">Ready to Take the Next Step in Your Career?</h2>
+      <p class="lead text-light mb-4 opacity-90 mx-auto" style="max-width: 600px;">
+        Join thousands of professionals and high-impact hiring managers making career milestones every single day.
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="/jobs" class="btn btn-light btn-lg px-4 text-primary fw-bold">
+          <i class="bi bi-search me-1"></i> Browse Jobs Now
+        </a>
+        <a href="/auth/register" class="btn btn-outline-light btn-lg px-4 fw-semibold">
+          <i class="bi bi-person-plus me-1"></i> Sign Up For Free
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

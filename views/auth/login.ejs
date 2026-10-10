@@ -1,0 +1,96 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-5">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-8">
+        <div class="card-modern shadow-lg">
+          <div class="p-4 p-md-5">
+            <div class="text-center mb-4">
+              <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class="bi bi-box-arrow-in-right"></i>
+              </div>
+              <h1 class="h3 fw-bold mb-1">Welcome Back</h1>
+              <p class="text-muted small">Sign in to your account to manage your applications or jobs</p>
+            </div>
+
+            <form action="/auth/login" method="POST" id="loginForm" autocomplete="off" novalidate>
+              <!-- Hidden decoy inputs to discourage aggressive browser password manager auto-fill -->
+              <input type="text" name="_decoy_username" style="display:none !important;" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <input type="password" name="_decoy_password" style="display:none !important;" tabindex="-1" autocomplete="new-password" aria-hidden="true">
+
+              <!-- Email Address Field -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    class="form-control border-start-0 ps-0"
+                    id="email"
+                    name="email"
+                    placeholder="name@example.com"
+                    autocomplete="off"
+                    value=""
+                    required
+                  >
+                  <div class="invalid-feedback" id="emailFeedback">
+                    Email address is required.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="password" class="form-label fw-semibold mb-0">Password <span class="text-danger">*</span></label>
+                </div>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0 text-muted">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input
+                    type="password"
+                    class="form-control border-start-0 border-end-0 ps-0"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="new-password"
+                    value=""
+                    required
+                  >
+                  <button class="btn btn-outline-secondary border-start-0 text-muted" type="button" id="toggleLoginPassword" aria-label="Toggle password visibility">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <div class="invalid-feedback" id="passwordFeedback">
+                    Password is required.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button with Loading State -->
+              <button type="submit" id="loginSubmitBtn" class="btn btn-primary w-100 py-2 mb-3 fw-bold">
+                <span id="loginBtnText">Log In <i class="bi bi-arrow-right ms-1"></i></span>
+                <span id="loginBtnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Signing In...
+                </span>
+              </button>
+
+              <div class="text-center text-muted small">
+                Don't have an account yet?
+                <a href="/auth/register" class="text-primary fw-semibold text-decoration-none">Create an account</a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

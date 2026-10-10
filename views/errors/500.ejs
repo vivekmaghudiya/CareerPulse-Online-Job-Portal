@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="py-5 my-auto">
+  <div class="container text-center py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="p-5 bg-white rounded-4 shadow-sm border">
+          <div class="display-1 fw-extrabold text-danger mb-3">500</div>
+          <h2 class="h3 fw-bold mb-2">Internal Server Error</h2>
+          <p class="text-muted mb-4">
+            Something unexpected occurred on our servers. Our team has been notified, and we are working to resolve the issue promptly.
+          </p>
+          <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-secondary text-start small font-monospace mb-4">
+              <%= error %>
+            </div>
+          <% } %>
+          <div class="d-flex justify-content-center gap-3">
+            <a href="/" class="btn btn-primary px-4">
+              <i class="bi bi-house-door me-1"></i> Return Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4">
+              <i class="bi bi-arrow-left me-1"></i> Go Back
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

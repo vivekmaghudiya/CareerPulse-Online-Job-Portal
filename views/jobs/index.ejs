@@ -1,0 +1,204 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="py-4">
+  <div class="container">
+    <!-- Breadcrumb & Title -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Jobs</li>
+          </ol>
+        </nav>
+        <h1 class="h3 fw-bold mb-0">Browse Job Vacancies</h1>
+        <p class="text-muted small mb-0">Showing <%= pagination.totalJobs %> opportunities available</p>
+      </div>
+
+      <% if (currentUser && currentUser.role === 'employer') { %>
+        <a href="/jobs/new" class="btn btn-primary d-inline-flex align-items-center gap-1">
+          <i class="bi bi-plus-lg"></i> Post a New Job
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Main Content Grid with Sidebar Filters -->
+    <div class="row g-4">
+      <!-- Filter Sidebar -->
+      <div class="col-lg-3">
+        <div class="card-modern p-4 sticky-top" style="top: 85px; z-index: 10;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-funnel me-1 text-primary"></i> Filters</h5>
+            <a href="/jobs" class="small text-muted text-decoration-none hover-primary">Reset all</a>
+          </div>
+
+          <form action="/jobs" method="GET">
+            <!-- Search Keyword -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Keywords</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Title or company" value="<%= query.q %>">
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Location</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                <input type="text" name="location" class="form-control border-start-0 ps-0" placeholder="City or Remote" value="<%= query.location %>">
+              </div>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Job Category</label>
+              <select name="category" class="form-select">
+                <option value="all">All Categories</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat %>" <%= query.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Job Type -->
+            <div class="mb-4">
+              <label class="form-label small fw-bold">Employment Type</label>
+              <select name="jobType" class="form-select">
+                <option value="all">All Types</option>
+                <% jobTypes.forEach(jt => { %>
+                  <option value="<%= jt %>" <%= query.jobType === jt ? 'selected' : '' %>><%= jt %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
+              Apply Filters
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Job List Cards -->
+      <div class="col-lg-9">
+        <!-- Active Filter Chips -->
+        <% if (query.q || query.location || query.category !== 'all' || query.jobType !== 'all') { %>
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3 bg-white p-3 rounded-3 border">
+            <span class="small text-muted fw-semibold">Active filters:</span>
+            <% if (query.q) { %>
+              <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                Query: "<%= query.q %>"
+              </span>
+            <% } %>
+            <% if (query.location) { %>
+              <span class="badge bg-light text-dark border d-flex align-items-center gap-1">
+                Location: "<%= query.location %>"
+              </span>
+            <% } %>
+            <% if (query.category !== 'all') { %>
+              <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                <%= query.category %>
+              </span>
+            <% } %>
+            <% if (query.jobType !== 'all') { %>
+              <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                <%= query.jobType %>
+              </span>
+            <% } %>
+            <a href="/jobs" class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 text-decoration-none ms-auto">
+              Clear All
+            </a>
+          </div>
+        <% } %>
+
+        <% if (jobs && jobs.length > 0) { %>
+          <div class="row g-3">
+            <% jobs.forEach(job => { %>
+              <div class="col-12">
+                <div class="card-modern p-3 p-md-4 transition-card">
+                  <div class="row align-items-center g-3">
+                    <div class="col-md-8">
+                      <div class="d-flex align-items-start gap-3">
+                        <div class="company-avatar">
+                          <%= job.company.charAt(0).toUpperCase() %>
+                        </div>
+                        <div>
+                          <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                            <span class="fw-bold text-muted small"><%= job.company %></span>
+                            <span class="badge-job-type"><%= job.jobType %></span>
+                            <% if (job.isFeatured) { %>
+                              <span class="badge-featured"><i class="bi bi-star-fill text-warning"></i> Featured</span>
+                            <% } %>
+                          </div>
+
+                          <h5 class="fw-bold mb-1">
+                            <a href="/jobs/<%= job._id %>" class="text-decoration-none text-dark hover-primary">
+                              <%= job.title %>
+                            </a>
+                          </h5>
+
+                          <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mt-2">
+                            <span><i class="bi bi-geo-alt me-1 text-primary"></i> <%= job.location %></span>
+                            <span><i class="bi bi-folder me-1 text-primary"></i> <%= job.category %></span>
+                            <span class="fw-semibold text-primary"><i class="bi bi-cash-stack me-1"></i> <%= job.salary %></span>
+                            <span><i class="bi bi-clock me-1"></i> <%= timeAgo(job.createdAt) %></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4 text-md-end pt-2 pt-md-0 border-top border-md-0">
+                      <a href="/jobs/<%= job._id %>" class="btn btn-outline-primary px-3 py-2 w-100 w-md-auto">
+                        View Details <i class="bi bi-arrow-right ms-1"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <!-- Pagination -->
+          <% if (pagination.totalPages > 1) { %>
+            <nav class="mt-4" aria-label="Job listings page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item <%= !pagination.hasPrev ? 'disabled' : '' %>">
+                  <a class="page-link" href="/jobs?page=<%= pagination.currentPage - 1 %>&q=<%= query.q %>&location=<%= query.location %>&category=<%= query.category %>&jobType=<%= query.jobType %>">
+                    Previous
+                  </a>
+                </li>
+                <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                  <li class="page-item <%= pagination.currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="/jobs?page=<%= i %>&q=<%= query.q %>&location=<%= query.location %>&category=<%= query.category %>&jobType=<%= query.jobType %>">
+                      <%= i %>
+                    </a>
+                  </li>
+                <% } %>
+                <li class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+                  <a class="page-link" href="/jobs?page=<%= pagination.currentPage + 1 %>&q=<%= query.q %>&location=<%= query.location %>&category=<%= query.category %>&jobType=<%= query.jobType %>">
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          <% } %>
+
+        <% } else { %>
+          <div class="card-modern text-center py-5 px-3">
+            <div class="my-4">
+              <i class="bi bi-search text-muted display-4"></i>
+              <h4 class="fw-bold mt-3">No matching jobs found</h4>
+              <p class="text-muted small">Try broadening your search criteria or resetting filters.</p>
+              <a href="/jobs" class="btn btn-primary mt-2">Clear All Filters</a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

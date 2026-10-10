@@ -1,0 +1,31 @@
+<div class="container mt-3">
+  <% 
+    let displaySuccess = typeof success_msg !== 'undefined' ? success_msg : '';
+    if (typeof successMessage !== 'undefined' && successMessage) displaySuccess = successMessage;
+    if (Array.isArray(displaySuccess)) displaySuccess = displaySuccess.filter(Boolean).join(' ');
+
+    let displayError = typeof error_msg !== 'undefined' ? error_msg : '';
+    if (typeof errorMessage !== 'undefined' && errorMessage) displayError = errorMessage;
+    if (Array.isArray(displayError)) displayError = displayError.filter(Boolean).join(' ');
+  %>
+
+  <% if (displaySuccess && displaySuccess.trim().length > 0) { %>
+    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3" role="alert">
+      <i class="bi bi-check-circle-fill me-2 fs-5 text-success flex-shrink-0"></i>
+      <div>
+        <%= displaySuccess %>
+      </div>
+      <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <% if (displayError && displayError.trim().length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2 fs-5 text-danger flex-shrink-0"></i>
+      <div>
+        <%= displayError %>
+      </div>
+      <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+</div>
