@@ -2,6 +2,7 @@ const Application = require('../models/Application');
 const Job = require('../models/Job');
 const path = require('path');
 const fs = require('fs');
+const { isVercel, isCloudStorageConfigured, uploadToCloudinary } = require('../middleware/upload');
 
 // POST /jobs/:id/apply - Submit job application (Job Seeker)
 exports.applyToJob = async (req, res) => {
@@ -35,8 +36,27 @@ exports.applyToJob = async (req, res) => {
       return res.redirect(`/jobs/${jobId}`);
     }
 
-    // Relative web-accessible or downloadable path
-    const resumePath = `/uploads/resumes/${req.file.filename}`;
+    let resumePath = '';
+
+    if (isVercel) {
+      if (!isCloudStorageConfigured()) {
+        req.flash(
+          'error_msg',
+          'Resume file uploads are currently disabled on this cloud deployment because external storage (Cloudinary) is not yet configured. Please submit your application with a cover letter or contact the administrator.'
+        );
+        return res.redirect(`/jobs/${jobId}`);
+      }
+
+      try {
+        resumePath = await uploadToCloudinary(req.file.buffer, req.file.originalname, applicantId);
+      } catch (uploadErr) {
+        console.error('Cloudinary resume upload error:', uploadErr);
+        req.flash('error_msg', 'Failed to upload resume to cloud storage. Please try again.');
+        return res.redirect(`/jobs/${jobId}`);
+      }
+    } else {
+      resumePath = `/uploads/resumes/${req.file.filename}`;
+    }
 
     const application = new Application({
       jobId,
@@ -141,6 +161,16 @@ exports.updateApplicationStatus = async (req, res) => {
 // GET /uploads/resumes/:filename - Safe resume download / preview
 exports.downloadResume = (req, res) => {
   const filename = req.params.filename;
+  if (!filename) {
+    req.flash('error_msg', 'Invalid file request.');
+    return res.redirect('back');
+  }
+
+  // If the path is an external URL, redirect directly
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return res.redirect(filename);
+  }
+
   // Sanitize filename to prevent directory traversal
   const safeFilename = path.basename(filename);
   const filePath = path.join(__dirname, '..', 'uploads', 'resumes', safeFilename);

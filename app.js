@@ -16,6 +16,11 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+// Trust reverse proxy headers on Vercel & production deployments
+if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+  app.set('trust proxy', 1);
+}
+
 // Connect to Database
 connectDB();
 
@@ -60,6 +65,13 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.currentPath = req.path;
+  res.locals.isCloudDeployment = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+  res.locals.cloudStorageConfigured = Boolean(
+    (process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET) ||
+      process.env.CLOUDINARY_URL
+  );
   
   // Date formatting helper
   res.locals.formatDate = (date) => {

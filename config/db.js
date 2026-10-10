@@ -72,6 +72,11 @@ function maskMongoUri(uri) {
 }
 
 const connectDB = async () => {
+  // Reuse existing connection on warm serverless instances
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
   const rawUri = process.env.MONGODB_URI;
 
   if (!rawUri || rawUri.includes('127.0.0.1') || rawUri.includes('localhost')) {
@@ -103,7 +108,7 @@ const connectDB = async () => {
     console.error('3. User Privileges: Ensure user has "Read and write to any database" role.');
     console.error('4. Special Characters in Password: Automatic URL-encoding is active in config/db.js.\n');
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
       process.exit(1);
     }
   }

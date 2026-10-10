@@ -155,9 +155,9 @@ npm install
    NODE_ENV=development
    MONGODB_URI=mongodb://127.0.0.1:27017/jobportal
    SESSION_SECRET=dev_job_portal_secret_session_key_2026
-   ADMIN_NAME=System Administrator
-   ADMIN_EMAIL=admin@jobportal.com
-   ADMIN_PASSWORD=Admin123!
+   ADMIN_NAME=Your Admin Name
+   ADMIN_EMAIL=admin@example.com
+   ADMIN_PASSWORD=your_secure_admin_password_here
    ```
 
 > **Using MongoDB Atlas instead of Local MongoDB?**
@@ -308,20 +308,22 @@ In the **Environment Variables** tab of your Render Web Service, add the followi
 | `PORT` | `10000` | Render sets this automatically, but express reads `process.env.PORT` |
 | `MONGODB_URI` | `mongodb+srv://jobportal_user:<password>@cluster0.xxxx.mongodb.net/jobportal?retryWrites=true&w=majority` | Your live Atlas connection string |
 | `SESSION_SECRET` | `a_long_random_secure_secret_string_for_production_sessions` | Secret key for signed session cookies |
-| `ADMIN_EMAIL` | `admin@jobportal.com` | System administrator email |
-| `ADMIN_PASSWORD` | `SecureAdminPassword2026!` | Initial admin seed password |
+| `ADMIN_EMAIL` | `admin@example.com` | System administrator email placeholder |
+| `ADMIN_PASSWORD` | `your_secure_admin_password_here` | Initial admin seed password placeholder |
+| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name` | Cloudinary cloud name for serverless resume uploads |
+| `CLOUDINARY_API_KEY` | `your_api_key` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | `your_api_secret` | Cloudinary API secret |
 
 Click **Save Changes** and click **Deploy Web Service**.
 
 *Final Live Deployment URL format:*
-`https://<your-app-name>.onrender.com`
+`https://<your-app-name>.onrender.com` (or `https://<your-project>.vercel.app`)
 
 ---
 
 ### Handling Uploaded Resumes in Production
-- By default, resumes are saved in `uploads/resumes/` on local disk storage.
-- Free-tier hosting instances (such as Render Free) have ephemeral file systems, which reset when dynos spin down or restart.
-- For long-term production deployments with persistent file storage, you can connect cloud object storage such as **AWS S3** or **Cloudinary** by configuring the storage engine in `middleware/upload.js`.
+- By default, resumes are saved in `uploads/resumes/` on local disk storage in development.
+- For Vercel Serverless deployments, resume uploads automatically connect with **Cloudinary** cloud storage when `CLOUDINARY_*` environment variables are configured. If unconfigured, the application safely informs applicants without crashing.
 
 ---
 
